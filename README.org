@@ -1,111 +1,109 @@
-# Processor
-Projeto java que gerar classes "Repository" e "Controller" em um projeto spring a partir de anotações nas classes de modelo.
+#+TITLE:	B2W Challenge (Annotation)
+#+AUTHOR:	Jaguaraquem A. Reinaldo
+#+EMAIL:	jaguar.adler@gmail.com
+#+DATE:		2020-03-04
 
-## Instalação
+* Descrição
+Este projeto é resultado da separação do projeto [[https://github.com/jadler/processor.git][processor]], o outro projeto resultante desta separação encontra-se em [[https://github.com/jadler/b2w-processor.git][b2w-processor]].
 
-Clone este repositório para sua máquina local com `git clone https://github.com/jadler/processor.git` e execute o comando:
+Este projeto mantém um conjunto de anotações usadas para criar de forma automática as classes de =Repository=  e =Controller= dos seus respectivos modelos.
 
-    mvn clean install
-    
-## Uso
+* Uso
+Para criar a classe =Repository= para o modelo é necessário adicionar a anotação =@GenerateRepository= e para a classe =Controle= adicionar a anotação =@GenerateController=. É possível também criar consultas nas classes de controle para os campos das classe de modelo adicionando a anotação =@MappedProperty=. Para cada campo anotado com =@MappedProperty=, um método =getBy= será criado na classe =Controller=.
 
-Para criar classes de repositório para os modelos é necessário adicionar a anotação `@GenerateRepository` e para as classes de controle adicionar a anotação `@GenerateController`. O projeto também permite criar consultas nas classes de controle para os campos das classe de modelo adicionando a anotação `@MappedProperty`. Para cada campo anotado com `@MappedProperty`, um método getBy será criado na classe Controller.
+#+begin_src java
+  package br.com.jadler.models;
 
-```java
-package br.com.jadler.models;
+  import br.com.jadler.annotation.MappedProperty;
+  import br.com.jadler.annotation.GenerateRepository;
+  import br.com.jadler.annotation.GenerateController;
+  import org.springframework.data.annotation.Id;
 
-import br.com.jadler.annotation.MappedProperty;
-import br.com.jadler.annotation.GenerateRepository;
-import br.com.jadler.annotation.GenerateController;
-import org.springframework.data.annotation.Id;
+  @GenerateRepository
+  @GenerateController
+  public class Persons {
 
-@GenerateRepository
-@GenerateController
-public class Persons {
-    
-    @Id
-    @MappedProperty
-    private String id;
-    
-    @MappedProperty
-    private String name;
-    
-    @MappedProperty
-    private Integer age;
-    
-    // getters and setters
+      @Id
+      @MappedProperty
+      private String id;
 
-}
-```
+      @MappedProperty
+      private String name;
 
-As anotações acima irão gerar duas novas classes PersonsController e RepositoryController. Os pacotes em que as classes serão criadas irão usar como base o mesmo pacote to modelo, alterando apenas o último nome para controller e repository respectivamente.
+      @MappedProperty
+      private Integer age;
 
-#### PersonsController
+      // getters and setters
 
-```java
-package br.com.jadler.controller;
+  }
+#+end_src
 
-import ...
+As anotações acima irão gerar duas novas classes =PersonsController= e =PersonsRepository=. Os pacotes em que as classes serão criadas irão usar como base o mesmo pacote to modelo, alterando apenas o último nome para controller e repository respectivamente.
 
-@RestController
-@RequestMapping("/persons")
-@ApiOperation("...")
-public class PersonsController {
+** PersonsController
+#+begin_src java
+  package br.com.jadler.controller;
 
-    @Autowired
-    protected MongoRepository<Persons, String> repository;
+  import ...
 
-    @ApiOperation("...")
-    @GetMapping({"", "/"})
-    public Collection<Persons> list() {
-        //...
-    }
+  @RestController
+  @RequestMapping("/persons")
+  @ApiOperation("...")
+  public class PersonsController {
 
-    @ApiOperation("...")
-    @PostMapping({"/"})
-    public Persons create(@Valid @RequestBody Persons c) {
-        //...
-    }
+      @Autowired
+      protected MongoRepository<Persons, String> repository;
 
-    @ApiOperation("...")
-    @PutMapping({"/id/{id}"})
-    public Persons modify(@PathVariable("id") String id, @Valid @RequestBody Persons c) {
-        //...
-    }
+      @ApiOperation("...")
+      @GetMapping({"", "/"})
+      public Collection<Persons> list() {
+          //...
+      }
 
-    @ApiOperation("...")
-    @DeleteMapping({"/id/{id}"})
-    public void delete(@PathVariable String id) {
-        //...
-    }
+      @ApiOperation("...")
+      @PostMapping({"/"})
+      public Persons create(@Valid @RequestBody Persons c) {
+          //...
+      }
 
-    @ApiOperation("...")
-    @GetMapping(value = {"/id/{id}"})
-    public Persons getById(@PathVariable("id") java.lang.String value) {
-        //...
-    }
+      @ApiOperation("...")
+      @PutMapping({"/id/{id}"})
+      public Persons modify(@PathVariable("id") String id, @Valid @RequestBody Persons c) {
+          //...
+      }
 
-    @ApiOperation("...")
-    @GetMapping(value = {"/name/{name}"})
-    public Persons getByName(@PathVariable("name") java.lang.String value) {
-        //...
-    }
-    
-    @ApiOperation("...")
-    @GetMapping(value = {"/age/{age}"})
-    public Persons getByAge(@PathVariable("age") java.lang.Integer value) {
-        //...
-    }
-}
-```
+      @ApiOperation("...")
+      @DeleteMapping({"/id/{id}"})
+      public void delete(@PathVariable String id) {
+          //...
+      }
 
-#### PersonsRepository
+      @ApiOperation("...")
+      @GetMapping(value = {"/id/{id}"})
+      public Persons getById(@PathVariable("id") java.lang.String value) {
+          //...
+      }
 
-```java
-package br.com.jadler.repository;
+      @ApiOperation("...")
+      @GetMapping(value = {"/name/{name}"})
+      public Persons getByName(@PathVariable("name") java.lang.String value) {
+          //...
+      }
 
-import ...
+      @ApiOperation("...")
+      @GetMapping(value = {"/age/{age}"})
+      public Persons getByAge(@PathVariable("age") java.lang.Integer value) {
+          //...
+      }
+  }
+#+end_src
 
-public interface PersonsRepository extends MongoRepository<Persons, String> {
-}
-```
+** PersonsRepository
+#+begin_src java
+  package br.com.jadler.repository;
+
+  import ...
+
+  public interface PersonsRepository extends MongoRepository<Persons, String> {
+  }
+#+end_src
